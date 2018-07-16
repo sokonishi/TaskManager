@@ -6,22 +6,29 @@
   $dbh = new PDO($dsn, $user, $password);
   $dbh->query('SET NAMES utf8');
 
-  if (!empty($_POST)) {
+  $id = $_GET['id'];
+
+  $sql = 'SELECT * FROM `tasks` WHERE `id` = ?';
+  $data[] = $id;
+  $stmt = $dbh->prepare($sql);
+  $stmt->execute($data);
+
+  $schedule = $stmt->fetch(PDO::FETCH_ASSOC);
+
+  if(!empty($_POST)){
     $title = $_POST['title'];
     $date = $_POST['date'];
     $detail = $_POST['detail'];
 
-    $sql = 'INSERT INTO `tasks` SET `title`=?, `date`=?, `detail`=?';
-    $data = array($title,$date,$detail);
+    $sql = 'UPDATE `tasks` SET `title` = ?, `date` = ?, `detail` = ? WHERE `id` = ?';
+    $data = array($title,$date,$detail,$id);
     $stmt = $dbh->prepare($sql);
     $stmt->execute($data);
 
     header('Location: schedule.php');
-
   }
 
   $dbh = null;
-
 
 ?>
 
@@ -42,16 +49,17 @@
 
         <form method="POST" action="">
           <div class="form-group">
-            <label for="task">タイトル</label>
-            <input name="title" class="form-control">
+            <label for="task">タスク</label>
+            <input name="title" class="form-control" value="<?php echo $schedule['title'] ?>">
+            <input type="hidden" name="id" value="<?php echo $schedule['id'] ?>">
           </div>
           <div class="form-group">
             <label for="date">日程</label>
-            <input type="date" name="date" class="form-control">
+            <input type="date" name="date" class="form-control" value="<?php echo $schedule['date'] ?>">
           </div>
           <div class="form-group">
             <label for="detail">詳細</label>
-            <textarea name="detail" class="form-control" rows="3"></textarea><br>
+            <textarea name="detail" class="form-control" rows="3" ><?php echo $schedule['detail'] ?></textarea><br>
           </div>
           <input type="submit" class="btn btn-primary" value="投稿">
         </form>

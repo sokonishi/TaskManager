@@ -1,3 +1,34 @@
+<?php
+
+  $dsn = 'mysql:dbname=SkillTest1;host=localhost';
+  $user = 'root';
+  $password = '';
+  $dbh = new PDO($dsn, $user, $password);
+  $dbh->query('SET NAMES utf8');
+
+  $sql = 'SELECT * FROM `tasks` ORDER BY `date` ASC';
+  $stmt = $dbh->prepare($sql);
+  $stmt->execute();
+
+  $schedules = array();
+  while (1) {
+    $rec = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if ($rec == false) {
+      break;
+    }
+    $schedules[] = $rec;
+  }
+
+  // echo '<pre>';
+  // var_dump($schedules);
+  // echo '<pre>';
+
+  $dbh = null;
+
+
+?>
+
 <!DOCTYPE html>
 <html lang="ja">
 <head>
@@ -16,41 +47,21 @@
         <h2 class="text-center content_header">タスク管理</h2>
 
         <div class="col-xs-4">
-          <a href="post.html" class="btn btn-primary button">追加</a>
+          <a href="post.php" class="btn btn-primary button">追加</a>
         </div>
 
         <div class="col-xs-8">
-          <div class="task">
-            <h3>8月15日</h3>
-            <div class="content">
-              <h3 style="font-weight: bold;">明日映画に行く</h3>
-              <h4>ノブさんと映画見に行くことになったが、気まずいら事前に誰かを誘いたい。太一にはもう聞いて見たが断られた。でも二人で行きたくないから必死に誰かを誘いたい</h4>
+          <?php foreach($schedules as $schedule){ ?>
+            <div class="task">
+              <h3><?php echo $schedule['date'] ?></h3>
+              <div class="content">
+                <h3 style="font-weight: bold;"><?php echo $schedule['title'] ?></h3>
+                <h4><?php echo $schedule['detail'] ?></h4>
+                <a href="edit.php?id=<?php echo $schedule["id"]; ?>" class="btn btn-success" style="color: white">編集</a>
+                <a href="delete.php?id=<?php echo $schedule["id"]; ?>" class="btn btn-danger" style="color: white">削除</a>
+              </div>
             </div>
-          </div>
-
-          <div class="task">
-            <h3>8月15日</h3>
-            <div class="content">
-              <h3 style="font-weight: bold;">明日映画に行く</h3>
-              <h4>ノブさんと映画見に行くことになったが、気まずいら事前に誰かを誘いたい。太一にはもう聞いて見たが断られた。でも二人で行きたくないから必死に誰かを誘いたい</h4>
-            </div>
-          </div>
-
-          <div class="task">
-            <h3>8月15日</h3>
-            <div class="content">
-              <h3 style="font-weight: bold;">明日映画に行く</h3>
-              <h4>ノブさんと映画見に行くことになったが、気まずいら事前に誰かを誘いたい。太一にはもう聞いて見たが断られた。でも二人で行きたくないから必死に誰かを誘いたい</h4>
-            </div>
-          </div>
-
-          <div class="task">
-            <h3>8月15日</h3>
-            <div class="content">
-              <h3 style="font-weight: bold;">明日映画に行く</h3>
-              <h4>ノブさんと映画見に行くことになったが、気まずいら事前に誰かを誘いたい。太一にはもう聞いて見たが断られた。でも二人で行きたくないから必死に誰かを誘いたい</h4>
-            </div>
-          </div>
+          <?php } ?>
         </div>
 
       </div>
